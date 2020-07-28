@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CustMapper">
+	<resultMap id="CustResultMap" type="Cust" />
+
+	<select id="selectAllCustCount" resultType="int">
+		SELECT count(*) FROM cust
+	</select>
+
+	<select id="selectCustById" resultMap="CustResultMap">
+		SELECT * FROM cust where id=#{id}
+	</select>
+
+	<select id="selectCustByUuid" resultMap="CustResultMap">
+		SELECT * FROM cust where uuid=#{uuid}
+	</select>
+
+	<select id="selectByCustIdNoAndChnName" parameterType="Map" resultMap="CustResultMap">
+		SELECT * FROM cust where cust_id_no=#{custIdNo} and cust_chn_name=#{custChnName}
+	</select>
+
+	<select id="selectByCustIdNo" parameterType="Map" resultMap="CustResultMap">
+		SELECT * FROM cust where cust_id_no=#{custIdNo}
+	</select>
+
+	<!-- Deprecated -->
+	<select id="selectByCustIdNoOrChnName" parameterType="Map" resultMap="CustResultMap">
+		SELECT * FROM cust
+		where (cust_id_no=#{custIdNo} OR cust_chn_name=#{custChnName}) AND category=#{category}
+		order by id desc
+	</select>
+
+	<select id="selectByQryKey" parameterType="Map" resultMap="CustResultMap">
+		SELECT * FROM cust c
+		where
+		<if test="!@org.apache.commons.lang3.StringUtils@isEmpty(custIdNo) || !@org.apache.commons.lang3.StringUtils@isEmpty(custChnName)">
+			(cust_id_no=#{custIdNo} OR cust_chn_name=#{custChnName}) AND
+		</if>
+		category=#{category}
+		<if test="!@org.apache.commons.lang3.StringUtils@isEmpty(paperNo)">
+			AND exists (select * from cust_acct a where a.cust_id=c.id and paper_no=#{paperNo})
+		</if>
+		<if test="!@org.apache.commons.lang3.StringUtils@isEmpty(domainAccount)">
+			AND exists (select * from cust_acct a where a.cust_id=c.id and domain_account=#{domainAccount})
+		</if>
+		order by id desc
+	</select>
+
+	<select id="selectAllCustPage" parameterType="com.twm.pid.common.dto.page.PageQryLimit" resultMap="CustResultMap">
+		SELECT * FROM cust
+		order by id desc
+		limit #{startIdx},#{fetchSize}
+	</select>
+
+	<insert id="insertCust" parameterType="Cust" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO cust(uuid, cust_id_no, cust_chn_name, category, mrk, sex, upgrade_time)
+		VALUES(#{uuid},#{custIdNo},#{custChnName},#{category},#{mrk},#{sex},#{upgradeTime})
+	</insert>
+
+	<update id="updateCust" parameterType="Cust">
+		UPDATE cust
+		SET cust_id_no=#{custIdNo}, cust_chn_name=#{custChnName}, category=#{category},
+		mrk=#{mrk}, sex=#{sex}, upgrade_time=#{upgradeTime}
+		WHERE id=#{id}
+	</update>
+
+	<select id="selectByDynamic" parameterType="Map" resultMap="CustResultMap">
+		SELECT * FROM cust WHERE 1=1
+		<if test="!@org.apache.commons.lang3.StringUtils@isBlank(custIdNo)">
+		 AND cust_id_no=#{custIdNo} 
+		</if>
+		<if test="!@org.apache.commons.lang3.StringUtils@isBlank(custChnName)">
+		 AND cust_chn_name like  concat('%',#{custChnName},'%')    
+		</if>
+		<if test="!@org.apache.commons.lang3.StringUtils@isBlank(asDomainName)">
+		 AND as_domain_name like  concat(#{asDomainName},'%')    
+		</if>
+	</select>
+
+	<select id="selectAll" resultMap="CustResultMap">
+		SELECT * FROM cust
+	</select>
+</mapper>
