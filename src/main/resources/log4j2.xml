@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- configuration status="OFF" 表示不記錄log4j2本身的日誌 , monitorInterval="60" 指log4j2每隔60秒，自動監控該配置是否有變化 -->
+<configuration status="OFF" monitorInterval="60">
+	<Properties>
+		<Property name="log-path">/logs/</Property>
+		<Property name="log-project-name">spring-boot-test1</Property>
+		<Property name="log-pattern"> %d %-5p:%c %M()(%L)[%t]- %m%n</Property>
+		<Property name="rollover-strategy-max">7</Property>
+		<Property name="rolling-size-based">30 MB</Property>
+	</Properties>
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout>
+				<pattern>${log-pattern}</pattern>
+			</PatternLayout>
+		</Console>
+		<Routing name="Routing">
+			<Routes pattern="$${ctx:logfile}">
+				<!-- This route is chosen if ThreadContext has a value for logfile -->
+				<Route>
+					<RollingFile name="${ctx:logfile}" fileName="${log-path}/${log-project-name}-${ctx:logfile}.log" filePattern="${log-path}/${log-project-name}-${ctx:logfile}.%d{yyyy-MM-dd}-%i.log.zip">
+						<PatternLayout>
+							<pattern>${log-pattern}</pattern>
+						</PatternLayout>
+						<Policies>
+							<TimeBasedTriggeringPolicy />
+<!-- 							<SizeBasedTriggeringPolicy size="${rolling-size-based}" /> -->
+						</Policies>
+						<DefaultRolloverStrategy max="${rollover-strategy-max}" />
+					</RollingFile>
+				</Route>
+			</Routes>
+		</Routing>
+
+		<RollingFile name="FILE.ALL" fileName="${log-path}/${log-project-name}.log" filePattern="${log-path}/${log-project-name}.%d{yyyy-MM-dd}-%i.log.zip">
+			<PatternLayout>
+				<pattern>${log-pattern}</pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+<!-- 				<SizeBasedTriggeringPolicy size="${rolling-size-based}" /> -->
+			</Policies>
+			<DefaultRolloverStrategy>
+				<Delete basePath="${log-path}" maxDepth="1">
+					<IfFileName glob="${log-project-name}.log.*" />
+					<IfLastModified age="30d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+	</appenders>
+	<Loggers>
+
+		<!-- <logger name="com.twm.pid.asm.ws.impl" additivity="false"> <AppenderRef ref="wsLogFile" /> </logger> -->
+		<!-- <AsyncLogger name="com.twm.pid.asm.ws.impl" level="info" includeLocation="true"> <AppenderRef ref="mongoDB"/> </AsyncLogger> -->
+
+		<Root level="info">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="FILE.ALL" />
+			<AppenderRef ref="Routing" />
+		</Root>
+
+	</Loggers>
+</configuration>
