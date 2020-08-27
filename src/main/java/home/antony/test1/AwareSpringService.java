@@ -9,9 +9,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-//import top.wisely.springfundamentals.event.MessageEvent;
 
 import java.io.IOException;
+
+//import top.wisely.springfundamentals.event.MessageEvent;
 
 @Component
 public class AwareSpringService implements BeanNameAware,

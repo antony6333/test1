@@ -50,13 +50,13 @@ public class SpringTest1Application {
             String[] beanNames = ctx.getBeanDefinitionNames();
             Arrays.sort(beanNames);
             for (String beanName : beanNames) {
-                System.out.println(beanName);
+                //System.out.println(beanName);
             }
 
-            System.out.println("\n-----------------------------------------");
+            //System.out.println("\n-----------------------------------------");
             awareSpringService.doSomething();
 
-            System.out.println("\n-----------------------------------------");
+            //System.out.println("\n-----------------------------------------");
             DemoLogService demoLogService = awareSpringService.getBeanFactory().getBean(DemoLogService.class);
             demoLogService.doSomething();
 
